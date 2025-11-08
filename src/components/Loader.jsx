@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useLoadingStore } from "../store/LoadingStore";
+import { useProgress } from "@react-three/drei";
 
 function Loader() {
-  const progress = useLoadingStore((state) => state.getOverallProgress());
+  const { active, progress, loaded, total, item } = useProgress();
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    if (progress >= 100) {
+    if (!active && progress >= 100) {
       const timer = setTimeout(() => {
         setIsVisible(false);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [progress]);
+  }, [active, progress]);
 
   if (!isVisible) return null;
+
+  const pct = Math.min(100, Math.max(0, progress || 0));
 
   return (
     <div
@@ -29,34 +31,35 @@ function Loader() {
         justifyContent: "center",
         backgroundColor: "#111827",
         zIndex: 9999,
-        opacity: progress >= 100 ? 0 : 1,
+        opacity: !active && pct >= 100 ? 0 : 1,
         transition: "opacity 500ms",
-        pointerEvents: progress >= 100 ? "none" : "auto",
+        pointerEvents: !active && pct >= 100 ? "none" : "auto",
       }}
     >
       <div style={{ textAlign: "center" }}>
         <div style={{ marginBottom: "1rem" }}>
           <div
             style={{
-              width: "256px",
-              height: "8px",
+              width: "320px",
+              height: "10px",
               backgroundColor: "#374151",
               borderRadius: "9999px",
               overflow: "hidden",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
             }}
           >
             <div
               style={{
                 height: "100%",
-                backgroundColor: "#3b82f6",
-                width: `${progress}%`,
-                transition: "width 300ms ease-out",
+                background: "linear-gradient(90deg,#60a5fa,#3b82f6)",
+                width: `${pct}%`,
+                transition: "width 200ms ease-out",
               }}
             />
           </div>
         </div>
         <p style={{ color: "white", fontSize: "1.125rem", fontWeight: 600 }}>
-          Loading... {Math.round(progress)}%
+          Loading... {Math.round(pct)}%
         </p>
         <p
           style={{
@@ -65,11 +68,7 @@ function Loader() {
             marginTop: "0.5rem",
           }}
         >
-          {progress < 50
-            ? "Loading base model..."
-            : progress < 100
-            ? "Loading navigation mesh..."
-            : "Complete!"}
+          {item ? `Downloading: ${item}` : `${loaded}/${total} assets`}
         </p>
       </div>
     </div>
