@@ -1,3 +1,4 @@
+// Scene.jsx
 import React, { useState } from "react";
 import BaseModel from "./BaseModel";
 import NavMesh from "./NavMesh";
@@ -6,6 +7,7 @@ import Lights from "./Lights";
 
 function Scene() {
   const [navMeshObject, setNavMeshObject] = useState(null);
+  const [baseModelObject, setBaseModelObject] = useState(null);
   const [targetPosition, setTargetPosition] = useState(null);
 
   const handleNavMeshClick = (point) => {
@@ -16,10 +18,11 @@ function Scene() {
   return (
     <>
       <Lights />
-      <BaseModel />
+      <BaseModel onLoad={setBaseModelObject} />
       <NavMesh onLoad={setNavMeshObject} onClick={handleNavMeshClick} />
       <CameraController
         navMesh={navMeshObject}
+        baseModel={baseModelObject}
         targetPosition={targetPosition}
         onReachTarget={() => setTargetPosition(null)}
       />
