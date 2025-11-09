@@ -1,4 +1,3 @@
-// Scene.jsx
 import React, { useState } from "react";
 import BaseModel from "./BaseModel";
 import NavMesh from "./NavMesh";
